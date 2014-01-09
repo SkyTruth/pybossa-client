@@ -19,28 +19,34 @@ def set(key, val):
     _opts[key] = val
 
 
-def _pybossa_req(method, domain, id=None, payload=None, params=None):
+def _pybossa_req(method, domain, id=None, action=None, payload=None, params=None, files=None, asjson=True):
     """
     Sends a JSON request
 
     Returns True if everything went well, otherwise it returns the status code of the response
     """
-    headers = {'content-type': 'application/json'}
+    headers = {}
+    if asjson:
+        headers = {'content-type': 'application/json'}
     url = _opts['endpoint'] + '/api/' + domain
     if id is not None:
         url += '/' + str(id)
+    if action is not None:
+        url += '/' + action
     if params is None:
         params = dict()
     if 'api_key' in _opts:
         params['api_key'] = _opts['api_key']
+    if payload is not None and asjson:
+        payload = json.dumps(payload)
     if method == 'get':
         r = requests.get(url, params=params)
     elif method == 'post':
-        r = requests.post(url, params=params, headers=headers, data=json.dumps(payload))
+        r = requests.post(url, params=params, headers=headers, data=payload, files=files)
     elif method == 'put':
-        r = requests.put(url, params=params, headers=headers, data=json.dumps(payload))
+        r = requests.put(url, params=params, headers=headers, data=payload)
     elif method == 'delete':
-        r = requests.delete(url, params=params, headers=headers, data=json.dumps(payload))
+        r = requests.delete(url, params=params, headers=headers, data=payload)
     #print r.status_code, r.status_code / 100
     if r.status_code / 100 == 2:
         if r.text and r.text != '""':
@@ -199,6 +205,11 @@ def update_app(app):
     except:
         raise
 
+def add_file(app, srcfile, dstname):
+    return _pybossa_req('post', 'app', app.id, "addfile",
+                        params={'filename':dstname},
+                        files={'file': srcfile},
+                        asjson=False)
 
 def delete_app(app_id):
     """Deletes an Application with id = app_id
