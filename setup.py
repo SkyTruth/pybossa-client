@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='pybossa-client',
-    version='0.4.1',
+    version='0.4.2',
     packages=find_packages(),
-    install_requires=['requests>=0.13.0'],
+    install_requires=['requests>=0.13.0', 'Django>=1.5.1'],
     # metadata for upload to PyPI
     author='Open Knowledge Foundation Labs',
     # TODO: change
@@ -24,5 +24,6 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    entry_points=''''''
+    entry_points='''''',
+    scripts = ["pybossa-client"]
 )
